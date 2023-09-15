@@ -1,0 +1,99 @@
+{{ define "menu" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  <script defer src="/static/scripts/bootstrap.min.bundle.js"></script>
+  <link rel="stylesheet" href="/static/stylesheet/bootstrap.min.css">
+  <title>Library Process</title>
+  <style>
+    body {
+      height: 1000px;
+      background-color: 1px solid red;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar bg-body-tertiary fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Kenyatta University Library</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Library Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class='nav-item {{ if (eq .pgs_  "1")}}  active {{end}}'>
+              <a class="nav-link active" aria-current="page" onclick="postto('',{pgs_:'1'})" href="#">Home</a>
+            </li>
+            <li class='nav-item {{ if (eq .pgs_  "2")}}  active {{end}}'>
+              <a class="nav-link" onclick="postto('',{pgs_:'2'})" href="#">About</a>
+            </li>
+            <li class='nav-item dropdown {{ if (eq ( slice .pgs_ 0 1)  "3")}}  active {{end}}'>
+              <a class="nav-link dropdown-toggle" href="menu?pgs_=3" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Menu
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class='dropdown-item {{ if (eq .pgs_  "3-1")}}  active {{end}}' onclick="postto('',{pgs_:'3-1'})" href="?pgs_=3-1">Catalog</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class='dropdown-item {{ if (eq .pgs_  "3-2")}}  active {{end}}' onclick="postto('',{pgs_:'3-2'})" href="?pgs_=3-2">Books</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class='dropdown-item {{ if (eq .pgs_  "3-3")}}  active {{end}}' onclick="postto('',{pgs_:'3-3'})" href="?pgs_=3-3">Borrowed Books</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class='dropdown-item {{ if (eq .pgs_  "3-4")}}  active {{end}}' onclick="postto('',{pgs_:'3-4'})" href="?pgs_=3-4">Students</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class='dropdown-item {{ if (eq .pgs_  "3-5")}}  active {{end}}' onclick="postto('',{pgs_:'3-5'})" href="?pgs_=3-5">Departments</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="d-flex mt-3" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container-fluid">
+    <div class="shadow p-3 mb-5 bg-white rounded"> 
+      {{ if (eq .pgs_  "3-1") }} 
+          {{ template "catalog" . }}
+      {{ end }}
+
+      {{ if (eq .pgs_  "3-2") }} 
+          {{ template "books" . }}
+      {{ end }}
+
+      {{ if (eq .pgs_  "3-3") }} 
+          {{ template "borrowedBooks" . }}
+      {{ end }}
+
+      {{ if (eq .pgs_  "3-4") }} 
+          {{ template "students" . }}
+      {{ end }}
+
+      {{ if (eq .pgs_  "3-5") }} 
+          {{ template "departments" . }}
+      {{ end }}
+    </div>
+  </div>
+
+  
+</body>
+</html>
+{{ end }}

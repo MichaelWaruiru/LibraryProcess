@@ -1,0 +1,193 @@
+{{ define "borrowedBooks"}}
+<div class="row p-2">
+  <div class="col-md-2"> 
+    Borrowed Books
+  </div>   
+</div>
+
+<!-- Add Borrowed Book Button -->
+<div class="row">
+  <div class="col-md-4">
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addBorrowedBookModal">
+      Add Borrowed Book
+    </button>
+  </div>
+</div>
+
+<div class="row">
+  <table border="1" class="table table-striped table-bordered dt-responsive table-hover" id="example2" width="100%">
+    <thead>
+      <tr width="100%">
+        <th align="center">Borrowing ID</th>
+        <th align="center">Student ID</th>
+        <th align="center">Book ID</th>
+        <th align="center">Return Date</th>
+        <th align="center">Exceeding Date</th>
+        <th align="center">Penalties</th>
+      </tr>
+    </thead> 
+    <tbody>
+      {{ range .borrowedBooks }}
+      <tr>
+        <td>{{ .BorrowingID }}</td>
+        <td>{{ .StudentID }}</td>
+        <td>{{ .BookID }}</td>
+        <td>{{ .ReturnDate }}</td>
+        <td>{{ .ExceedingDate }}</td>
+        <td>{{ .Penalties }}</td>
+        <td>
+          <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editBorrowedBookModal{{ .BorrowingID }}">Edit</button>
+          <button class="btn btn-danger" onclick="deleteBorrowedBook({{ .BorrowingID }})">Delete</button>
+          <div class="modal fade" id="editBorrowedBookModal{{ .BorrowingID }}" tabindex="-1" aria-labelledby="editBorrowedBookModalLabel{{ .BorrowingID }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editBorrowedBookModalLabel{{ .BorrowingID }}">Edit Borrowed Book</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="editBorrowedBookForm{{ .BorrowingID }}" action="/editBorrowedBook/{{ .BorrowingID }}" method="POST">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editStudentID{{ .BorrowingID }}" name="studentID" placeholder="Student ID" required value="{{ .StudentID }}">
+                      <label for="editStudentID{{ .BorrowingID }}">Student ID</label>
+                    </div>
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editBookID{{ .BorrowingID }}" name="bookID" placeholder="Book ID" required value="{{ .BookID }}">
+                      <label for="editBookID{{ .BorrowingID }}">Book ID</label>
+                    </div>
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editReturnDate{{ .BorrowingID }}" name="returnDate" placeholder="Return Date" required value="{{ .ReturnDate }}">
+                      <label for="editReturnDate{{ .BorrowingID }}">Return Date</label>
+                    </div>
+                    
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editExceedingDate{{ .BorrowingID }}" name="exceedingDate" placeholder="Exceeding Date" required value="{{ .ExceedingDate }}">
+                      <label for="editExceedingDate{{ .BorrowingID }}">Exceeding Date</label>
+                    </div>
+                    
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editPenalties{{ .BorrowingID }}" name="penalties" placeholder="Penalties" required value="{{ .Penalties }}">
+                      <label for="editPenalties{{ .BorrowingID }}">Penalties</label>
+                    </div>
+                    <button type="button" class="btn btn-primary mt-3" onclick="saveEditedBorrowedBook({{ .BorrowingID }})">Save</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table> 
+</div>
+
+<!-- Add Borrowed Book Modal -->
+<div class="modal fade" id="addBorrowedBookModal" tabindex="-1" aria-labelledby="addBorrowedBookModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBorrowedBookModalLabel">Add Borrowed Book</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/addBorrowedBook">
+          {{/* <div class="form-floating">
+            <input type="text" class="form-control" id="borrowingID" name="borrowingID" placeholder="Borrowing ID" readonly>
+            <label for="borrowingID">Borrowing ID</label>
+          </div> */}}
+          <div class="form-floating">
+            <input type="text" class="form-control" id="studentID" name="studentID" placeholder="Student ID" required>
+            <label for="studentID">Student ID</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="bookID" name="bookID" placeholder="Book ID" required>
+            <label for="bookID">Book ID</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="returnDate" name="returnDate" placeholder="Return Date" required>
+            <label for="returnDate">Return Date</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="exceedingDate" name="exceedingDate" placeholder="Exceeding Date" required>
+            <label for="exceedingDate">Exceeding Date</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="penalties" name="penalties" placeholder="Penalties" required>
+            <label for="penalties">Penalties</label>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const addBorrowedBookForm = document.getElementById("addBorrowedBookForm");
+  
+    addBorrowedBookForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+  
+      const formData = new FormData(addBorrowedBookForm);
+      const response = await fetch(addBorrowedBookForm.action, {
+        method: "POST",
+        body: formData
+      });
+  
+      if (response.ok) {
+        console.log("Borrowed book added successfully");
+      } else {
+        console.error("Failed to add borrowed book");
+      }
+      
+      // Close the modal
+      const addBorrowedBookModal = new bootstrap.Modal(document.getElementById("addBorrowedBookModal"));
+      addBorrowedBookModal.hide();
+    });
+  });
+
+  function saveEditedBorrowedBook(borrowingID) {
+    const editBorrowedBookForm = document.getElementById(`editBorrowedBookForm${borrowingID}`);
+    const editStudentIDInput = document.getElementById(`editStudentID${borrowingID}`);
+
+    // Validate form data
+    if (!editStudentIDInput.value) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // Use AJAX to submit the form data with POST method
+    fetch(`/editBorrowedBook/${borrowingID}`, {
+      method: "POST",
+      body: new FormData(editBorrowedBookForm)
+    })
+    .then(response => response.text())
+    .then(data => {
+      // Handle success, close the modal, or update/refresh the borrowed books list
+      location.reload();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+
+  function deleteBorrowedBook(borrowingID) {
+    if (confirm("Are you sure you want to delete this borrowed book?")) {
+      // Use AJAX to send a DELETE request
+      fetch(`/deleteBorrowedBook?borrowingID=${borrowingID}`, {
+        method: "DELETE"
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Handle success, update the borrowed books list or refresh the page
+        location.reload();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+    }
+  }
+</script>
+{{ end }}

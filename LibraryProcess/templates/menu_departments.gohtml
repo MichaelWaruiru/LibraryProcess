@@ -1,0 +1,152 @@
+{{ define "departments"}}
+<div class="row p-2">
+  <div class="col-md-2"> 
+    Department
+  </div>   
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">Add Department</button>
+  </div>
+</div>
+
+<div class="row">
+  <table border="1" class="table table-striped table-bordered dt-responsive table-hover" id="example2" width="100%">
+    <thead>
+      <tr width="100%">
+        <th align="center">Department ID</th>
+        <th align="center">Department Name</th>
+      </tr>
+    </thead> 
+    <tbody>
+      {{ range .departments }}
+      <tr>
+        <td>{{ .DepartmentID }}</td>
+        <td>{{ .DepartmentName }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editDepartmentModal{{ .DepartmentID }}">Edit</button>
+          <button id="deleteButton{{ .DepartmentID }}" class="btn btn-danger btn-sm" onclick="deleteDepartment({{ .DepartmentID }})">Delete</button>
+          <div class="modal fade" id="editDepartmentModal{{ .DepartmentID }}" tabindex="-1" aria-labelledby="editDepartmentModalLabel{{ .DepartmentID }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editDepartmentModalLabel{{ .DepartmentID }}">Edit Department</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="editDepartmentForm{{ .DepartmentID }}">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="editedDepartmentName{{ .DepartmentID }}" name="departmentName" value="{{ .DepartmentName }}" required>
+                      <label for="editedDepartmentName{{ .DepartmentID }}">Department Name</label>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" onclick="saveEditedDepartment({{ .DepartmentID }})">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </td>
+      </tr>
+      {{ end }}
+    </tbody>
+  </table> 
+</div>
+
+<!-- Add Department Modal -->
+<div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-labelledby="addDepartmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addDepartmentModalLabel">Add New Department</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="/addDepartment">
+          
+          <div class="form-floating">
+            <input type="text" class="form-control" id="departmentName" name="departmentName" placeholder="Department Name" required>
+            <label for="departmentName">Department Name</label>
+          </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const addDepartmentForm = document.getElementById("addDepartmentForm");
+  const addDepartmentButton = document.getElementById("addDepartmenttButton");
+
+  addDepartmentButton.addEventListener("click", function() {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Use AJAX to submit the form data
+    fetch("/addDepartment", {
+      method: "POST",
+      body: new FormData(addDepartmentForm)
+    })
+    .then(response => response.text())
+    .then(data => {
+    // Reload the page after successful addition
+    location.reload();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  });
+  });
+
+  function deleteDepartment(departmentID) {
+    if (confirm("Are you sure you want to delete this department?")) {
+      fetch(`/deleteDepartment/?departmentID=${departmentID}`, {
+        method: "DELETE"
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Handle success or show an appropriate message
+        // Reload or update the department list
+        location.reload();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+    }
+  }
+
+  function saveEditedDepartment(departmentID) {
+    const editedDepartmentName = document.getElementById(`editedDepartmentName${departmentID}`);
+    const editDepartmentForm = document.getElementById(`editDepartmentForm${departmentID}`);
+
+    // Validate department name
+    if (!editedDepartmentName) {
+      alert("Please provide a valid department name.");
+      return;
+    }
+
+    // Use AJAX to submit the form data
+    fetch(`/editDepartment/${departmentID}`, {
+      method: "POST",
+      body: new URLSearchParams(new FormData(editDepartmentForm))
+    })
+    .then(response => response.text())
+    .then(data => {
+      // Handle success, close the modal, or update the department list
+      const modal = document.getElementById(`editDepartmentModal${departmentID}`);
+      const modalInstance = bootstrap.Modal.getInstance(modal);
+      modalInstance.hide();
+      location.reload(); // For example, refresh the page to show updated data
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
+  }
+</script>
+{{ end }}
